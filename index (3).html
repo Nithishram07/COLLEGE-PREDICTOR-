@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CutoffCompass — College Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0B1F3A;
+      --blue:   #1554A0;
+      --accent: #F5A623;
+      --light:  #EDF2FB;
+      --white:  #FFFFFF;
+      --gray:   #6B7A99;
+      --border: #D0D9EC;
+      --success:#1A9E6E;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body:    'Inter', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--light);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--navy);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      color: #A8B8D4;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, #163A6E 100%);
+      padding: 64px 32px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(245,166,35,.08);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: rgba(21,84,160,.2);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -1px;
+      max-width: 640px;
+      margin: 0 auto 16px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero p {
+      color: #A8B8D4;
+      font-size: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── STATS STRIP ── */
+    .stats {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 0;
+    }
+    .stat {
+      padding: 20px 40px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    /* ── FORM CARD ── */
+    .form-wrap {
+      max-width: 760px;
+      margin: -36px auto 48px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(11,31,58,.12);
+      padding: 36px 40px;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .card-sub {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 28px;
+    }
+
+    /* ── FORM GRID ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy);
+    }
+    label .req { color: #D94040; margin-left: 2px; }
+
+    input, select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: var(--font-body);
+      color: var(--navy);
+      background: var(--white);
+      transition: border-color .2s, box-shadow .2s;
+      appearance: none;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(21,84,160,.1);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7A99' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .hint { font-size: 11px; color: var(--gray); }
+
+    /* ── BRANCH CHIPS ── */
+    .chip-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip-option {
+      display: none;
+    }
+    .chip-option + label {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray);
+      cursor: pointer;
+      transition: all .15s;
+      background: var(--white);
+      user-select: none;
+    }
+    .chip-option:checked + label {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--white);
+    }
+    .chip-option + label:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+    .chip-option:checked + label:hover {
+      color: var(--white);
+    }
+
+    /* ── SUBMIT ── */
+    .form-footer {
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .btn-predict {
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-predict:hover { background: #0F3E82; }
+    .btn-predict:active { transform: scale(.98); }
+    .btn-reset {
+      background: none;
+      border: 1.5px solid var(--border);
+      padding: 13px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--gray);
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .btn-reset:hover { border-color: var(--gray); color: var(--navy); }
+
+    /* ── RESULTS ── */
+    #results { display: none; margin-top: 32px; }
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .results-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .results-count {
+      font-size: 13px;
+      background: #EAF1FB;
+      color: var(--blue);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--navy); }
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      color: #A8B8D4;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--light); }
+    tbody td { padding: 13px 16px; color: var(--navy); vertical-align: middle; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-safe   { background: #D4F4E6; color: #0D6F4A; }
+    .badge-target { background: #FFF0D4; color: #8A5900; }
+    .badge-reach  { background: #FDEAEA; color: #9B2222; }
+
+    .no-results {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--gray);
+    }
+    .no-results svg { margin-bottom: 12px; opacity: .4; }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      max-width: 760px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+    .how-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--navy);
+    }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .step {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 22px 20px;
+      border: 1px solid var(--border);
+    }
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .step h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .step p { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      color: #A8B8D4;
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+    }
+    footer span { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .card { padding: 24px 20px; }
+      .stats { flex-wrap: wrap; }
+      .stat { flex: 1 1 40%; border-right: none; border-bottom: 1px solid var(--border); }
+      .steps { grid-template-columns: 1fr; }
+      nav { padding: 0 16px; }
+      .nav-links { gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Cutoff<span>Compass</span></div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#">Trends</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">TNEA · JoSAA · State Counselling</div>
+  <h1>Find colleges <em>you can get into</em> — based on real cutoffs</h1>
+  <p>Enter your rank or mark and category. We match you against past cutoff data to show your chances.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">500+</div>
+    <div class="stat-label">Colleges listed</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">5 yrs</div>
+    <div class="stat-label">Cutoff history</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">40+</div>
+    <div class="stat-label">Branches covered</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">Free</div>
+    <div class="stat-label">No login needed</div>
+  </div>
+</div>
+
+<!-- FORM CARD -->
+<div class="form-wrap">
+  <div class="card">
+    <div class="card-title">Predict your college</div>
+    <div class="card-sub">Fill in your details — results appear instantly below.</div>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Cutoff Mark <span class="req">*</span></label>
+        <input type="number" id="cutoff" placeholder="e.g. 185.5" min="0" max="200" step="0.5"/>
+        <span class="hint">Out of 200 (Maths + Physics + Chemistry)</span>
+      </div>
+
+      <div class="form-group">
+        <label>Rank (optional)</label>
+        <input type="number" id="rank" placeholder="e.g. 4500"/>
+        <span class="hint">Used if cutoff mark not available</span>
+      </div>
+
+      <div class="form-group">
+        <label>Category <span class="req">*</span></label>
+        <select id="category">
+          <option value="">Select category</option>
+          <option>OC</option>
+          <option>BC</option>
+          <option>BCM</option>
+          <option>MBC</option>
+          <option>SC</option>
+          <option>ST</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>District / Region</label>
+        <select id="district">
+          <option value="">All districts</option>
+          <option>Chennai</option>
+          <option>Coimbatore</option>
+          <option>Madurai</option>
+          <option>Salem</option>
+          <option>Trichy</option>
+          <option>Tirunelveli</option>
+          <option>Vellore</option>
+          <option>Erode</option>
+        </select>
+      </div>
+
+      <div class="form-group full">
+        <span class="chip-label">Preferred Branch(es) — pick one or more</span>
+        <div class="chips">
+          <input class="chip-option" type="checkbox" id="b1" value="CSE"/>
+          <label for="b1">CSE</label>
+          <input class="chip-option" type="checkbox" id="b2" value="ECE"/>
+          <label for="b2">ECE</label>
+          <input class="chip-option" type="checkbox" id="b3" value="EEE"/>
+          <label for="b3">EEE</label>
+          <input class="chip-option" type="checkbox" id="b4" value="Mech"/>
+          <label for="b4">Mech</label>
+          <input class="chip-option" type="checkbox" id="b5" value="Civil"/>
+          <label for="b5">Civil</label>
+          <input class="chip-option" type="checkbox" id="b6" value="IT"/>
+          <label for="b6">IT</label>
+          <input class="chip-option" type="checkbox" id="b7" value="AIDS"/>
+          <label for="b7">AI & DS</label>
+          <input class="chip-option" type="checkbox" id="b8" value="AIML"/>
+          <label for="b8">AI & ML</label>
+          <input class="chip-option" type="checkbox" id="b9" value="Biotech"/>
+          <label for="b9">Biotech</label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="form-footer">
+      <button class="btn-predict" onclick="predict()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Find Colleges
+      </button>
+      <button class="btn-reset" onclick="resetForm()">Reset</button>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <div id="results">
+      <div class="results-header">
+        <div class="results-title">Matched Colleges</div>
+        <div class="results-count" id="count-badge">0 found</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>College Name</th>
+              <th>Branch</th>
+              <th>District</th>
+              <th>Cutoff (2023)</th>
+              <th>Chance</th>
+            </tr>
+          </thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how">
+  <div class="how-title">How it works</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Enter your details</h3>
+      <p>Provide your cutoff mark, category, preferred branch and district.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>We match cutoffs</h3>
+      <p>Your score is compared against 5 years of real TNEA cutoff data.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>See your chances</h3>
+      <p>Colleges are labelled Safe, Target, or Reach based on your score gap.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Built by <span>Team CutoffCompass</span> · Data sourced from TNEA official counselling records
+</footer>
+
+<script>
+  // ── SAMPLE DATA (replace with real CSV/API later) ──
+  const colleges = [
+    { name: "Anna University, Chennai",          branch: "CSE",   district: "Chennai",     cutoff: 198.5 },
+    { name: "PSG College of Technology",         branch: "CSE",   district: "Coimbatore",  cutoff: 196.0 },
+    { name: "Coimbatore Institute of Technology",branch: "ECE",   district: "Coimbatore",  cutoff: 191.0 },
+    { name: "Government College of Technology",  branch: "CSE",   district: "Coimbatore",  cutoff: 193.5 },
+    { name: "Thiagarajar College of Engineering",branch: "Mech",  district: "Madurai",     cutoff: 185.0 },
+    { name: "NIT Trichy",                        branch: "CSE",   district: "Trichy",      cutoff: 199.0 },
+    { name: "SSN College of Engineering",        branch: "IT",    district: "Chennai",     cutoff: 189.5 },
+    { name: "Sri Venkateswara College",          branch: "AIDS",  district: "Vellore",     cutoff: 178.0 },
+    { name: "KCG College of Technology",         branch: "ECE",   district: "Chennai",     cutoff: 174.5 },
+    { name: "Erode Sengunthar Engineering",      branch: "Civil", district: "Erode",       cutoff: 162.0 },
+    { name: "Sri Ramakrishna Engineering",       branch: "EEE",   district: "Coimbatore",  cutoff: 170.5 },
+    { name: "Mepco Schlenk Engineering",         branch: "Mech",  district: "Tirunelveli", cutoff: 176.0 },
+    { name: "Bannari Amman Institute of Tech",   branch: "CSE",   district: "Erode",       cutoff: 182.5 },
+    { name: "Saranathan College of Engineering", branch: "ECE",   district: "Trichy",      cutoff: 168.0 },
+    { name: "Sona College of Technology",        branch: "AIDS",  district: "Salem",       cutoff: 172.0 },
+  ];
+
+  function getSelectedBranches() {
+    return [...document.querySelectorAll('.chip-option:checked')].map(c => c.value);
+  }
+
+  function getChanceLabel(userMark, cutoff) {
+    const gap = userMark - cutoff;
+    if (gap >= 5)        return '<span class="badge badge-safe">Safe</span>';
+    else if (gap >= -5)  return '<span class="badge badge-target">Target</span>';
+    else                 return '<span class="badge badge-reach">Reach</span>';
+  }
+
+  function predict() {
+    const cutoff   = parseFloat(document.getElementById('cutoff').value);
+    const category = document.getElementById('category').value;
+    const district = document.getElementById('district').value;
+    const branches = getSelectedBranches();
+
+    if (!cutoff || !category) {
+      alert('Please enter your cutoff mark and category.');
+      return;
+    }
+
+    // Filter: show colleges within +15 of user mark (reach) to any below (safe)
+    let filtered = colleges.filter(c => {
+      const withinRange  = cutoff >= c.cutoff - 15;
+      const branchMatch  = branches.length === 0 || branches.includes(c.branch);
+      const districtMatch= !district || c.district === district;
+      return withinRange && branchMatch && districtMatch;
+    });
+
+    // Sort by cutoff descending
+    filtered.sort((a, b) => b.cutoff - a.cutoff);
+
+    const tbody = document.getElementById('results-body');
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6">
+        <div class="no-results">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <p>No colleges matched. Try lowering your cutoff filter or selecting more branches.</p>
+        </div>
+      </td></tr>`;
+    } else {
+      filtered.forEach((c, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td style="color:var(--gray);font-size:12px">${i + 1}</td>
+            <td style="font-weight:500">${c.name}</td>
+            <td>${c.branch}</td>
+            <td>${c.district}</td>
+            <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:
