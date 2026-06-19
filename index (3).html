@@ -644,3 +644,26 @@
             <td>${c.branch}</td>
             <td>${c.district}</td>
             <td style="font-family:'Space Grotesk',sans-serif;font-weight:600;color:
+            ${cutoff >= c.cutoff ? 'var(--success)' : '#D94040'}">${c.cutoff.toFixed(1)}</td>
+            <td>${getChanceLabel(cutoff, c.cutoff)}</td>
+          </tr>`;
+      });
+    }
+
+    document.getElementById('count-badge').textContent = `${filtered.length} found`;
+    document.getElementById('results').style.display = 'block';
+  }
+
+  function resetForm() {
+    document.getElementById('cutoff').value = '';
+    document.getElementById('rank').value = '';
+    document.getElementById('category').value = '';
+    document.getElementById('district').value = '';
+    document.querySelectorAll('.chip-option').forEach(c => c.checked = false);
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('results-body').innerHTML = '';
+    document.getElementById('count-badge').textContent = '0 found';
+  }
+</script>
+</body>
+</html>
